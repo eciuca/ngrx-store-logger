@@ -1,12 +1,12 @@
-declare var console;
+declare var console: Console;
 
 const logger = console;
 const INIT_ACTION = '@ngrx/store/init';
 
-const repeat = (str, times) => new Array(times + 1).join(str);
-const pad = (num, maxLength) =>
+const repeat = (str: any, times: any) => new Array(times + 1).join(str);
+const pad = (num: number, maxLength: number) =>
   repeat(`0`, maxLength - num.toString().length) + num;
-const formatTime = time =>
+const formatTime = (time: any) =>
   `@ ${pad(time.getHours(), 2)}:${pad(time.getMinutes(), 2)}:${pad(
     time.getSeconds(),
     2
@@ -16,7 +16,7 @@ const timer =
     ? performance
     : Date;
 
-const getLogLevel = (level, action, payload, type) => {
+const getLogLevel = (level: any, action: any, payload: any, type: any) => {
   switch (typeof level) {
     case `object`:
       return typeof level[type] === `function`
@@ -29,7 +29,7 @@ const getLogLevel = (level, action, payload, type) => {
   }
 };
 
-const printBuffer = options => logBuffer => {
+const printBuffer = (options: any) => (logBuffer: any) => {
   const {
     actionTransformer,
     collapsed,
@@ -38,7 +38,7 @@ const printBuffer = options => logBuffer => {
     duration,
     level
   } = options;
-  logBuffer.forEach((logEntry, key) => {
+  logBuffer.forEach((logEntry: any, key: any) => {
     const { started, startedTime, action, error } = logEntry;
     const prevState = logEntry.prevState.nextState
       ? logEntry.prevState.nextState
@@ -103,42 +103,58 @@ const printBuffer = options => logBuffer => {
 
     if (prevStateLevel) {
       if (colors.prevState)
-        logger[prevStateLevel](
-          `%c prev state`,
-          `color: ${colors.prevState(prevState)}; font-weight: bold`,
-          prevState
-        );
-      else logger[prevStateLevel](`prev state`, prevState);
+        { // @ts-ignore
+          logger[prevStateLevel](
+                    `%c prev state`,
+                    `color: ${colors.prevState(prevState)}; font-weight: bold`,
+                    prevState
+                  );
+        }
+      else { // @ts-ignore
+        logger[prevStateLevel](`prev state`, prevState);
+      }
     }
 
     if (actionLevel) {
       if (colors.action)
-        logger[actionLevel](
-          `%c action`,
-          `color: ${colors.action(formattedAction)}; font-weight: bold`,
-          formattedAction
-        );
-      else logger[actionLevel](`action`, formattedAction);
+        { // @ts-ignore
+          logger[actionLevel](
+                    `%c action`,
+                    `color: ${colors.action(formattedAction)}; font-weight: bold`,
+                    formattedAction
+                  );
+        }
+      else { // @ts-ignore
+        logger[actionLevel](`action`, formattedAction);
+      }
     }
 
     if (error && errorLevel) {
       if (colors.error)
-        logger[errorLevel](
-          `%c error`,
-          `color: ${colors.error(error, prevState)}; font-weight: bold`,
-          error
-        );
-      else logger[errorLevel](`error`, error);
+        { // @ts-ignore
+          logger[errorLevel](
+                    `%c error`,
+                    `color: ${colors.error(error, prevState)}; font-weight: bold`,
+                    error
+                  );
+        }
+      else { // @ts-ignore
+        logger[errorLevel](`error`, error);
+      }
     }
 
     if (nextStateLevel) {
       if (colors.nextState)
-        logger[nextStateLevel](
-          `%c next state`,
-          `color: ${colors.nextState(nextState)}; font-weight: bold`,
-          nextState
-        );
-      else logger[nextStateLevel](`next state`, nextState);
+        { // @ts-ignore
+          logger[nextStateLevel](
+                    `%c next state`,
+                    `color: ${colors.nextState(nextState)}; font-weight: bold`,
+                    nextState
+                  );
+        }
+      else { // @ts-ignore
+        logger[nextStateLevel](`next state`, nextState);
+      }
     }
 
     try {
@@ -150,7 +166,7 @@ const printBuffer = options => logBuffer => {
   logBuffer.length = 0;
 };
 
-const isAllowed = (action, filter) => {
+const isAllowed = (action: any, filter: any) => {
   if (!filter) {
     return true;
   }
@@ -181,15 +197,9 @@ export const storeLogger = (opts: LoggerOptions = {}) => (
   if (ms_ie) {
     // Setting colors functions to null when it's an IE browser.
     colors = {
-      title: null,
-      prevState: null,
-      action: null,
-      nextState: null,
-      error: null
     };
   } else {
     colors = {
-      title: null,
       prevState: () => '#9E9E9E',
       action: () => '#03A9F4',
       nextState: () => '#4CAF50',
@@ -215,11 +225,11 @@ export const storeLogger = (opts: LoggerOptions = {}) => (
   const { stateTransformer } = options;
   const buffer = printBuffer(options);
 
-  return function(state, action) {
+  return function(state: any, action: any) {
     let preLog = {
       started: timer.now(),
       startedTime: new Date(),
-      prevState: stateTransformer(log),
+      prevState: stateTransformer?.(log),
       action
     };
 
@@ -227,7 +237,7 @@ export const storeLogger = (opts: LoggerOptions = {}) => (
 
     let postLog = {
       took: timer.now() - preLog.started,
-      nextState: stateTransformer(nextState)
+      nextState: stateTransformer?.(nextState)
     };
     log = Object.assign({}, preLog, postLog);
     //ignore init action fired by store and devtools
@@ -280,9 +290,9 @@ export interface LoggerFilterOption {
 }
 
 export interface LoggerColorsOption {
-  title: (action: Object) => string;
-  prevState: (prevState: Object) => string;
-  action: (action: Object) => string;
-  nextState: (nextState: Object) => string;
-  error: (error: any, prevState: Object) => string;
+  title?: (action: Object) => string;
+  prevState?: (prevState: Object) => string;
+  action?: (action: Object) => string;
+  nextState?: (nextState: Object) => string;
+  error?: (error: any, prevState: Object) => string;
 }
